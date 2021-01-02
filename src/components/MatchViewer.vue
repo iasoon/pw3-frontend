@@ -1,5 +1,12 @@
 <template>
     <canvas ref="canvas"/>
+    <input
+        type="range"
+        min="0"
+        v-bind:max="sliderMax"
+        step="1"
+        v-model="turnNum"
+    />
 </template>
 
 <script lang="ts">
@@ -16,13 +23,18 @@ export default {
             loading: true,
             error: false,
             matchData: null,
+            turnNum: 0,
+            sliderMax: 0,
         }
     },
     created() {
         this.fetchData();
     },
     mounted() {
-        
+        this.visualizer = new visualizer.Visualizer(this.$refs.canvas);
+    },
+    updated() {
+        this.renderScene();
     },
     methods: {
         fetchData() {
@@ -36,6 +48,7 @@ export default {
                 .then(resp => resp.json())
                 .then(data => {
                     this.matchData = parseMatchLog(data);
+                    this.sliderMax = this.matchData.length - 1;
                     this.loading = false;
                     this.renderScene();
                 })
@@ -43,8 +56,8 @@ export default {
         },
 
         renderScene() {
-            const state = this.matchData[0];
-            visualizer.drawState(this.$refs.canvas, state);
+            const state = this.matchData[this.turnNum];
+            this.visualizer.render(state);
         }
     }
 }
