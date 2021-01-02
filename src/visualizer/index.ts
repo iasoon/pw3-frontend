@@ -13,12 +13,15 @@ export class Visualizer {
         app.stage.removeChildren();
         const sceneBox = boundingBox(gameState.planets);
     
-        const padding = 50;
+        const padding = 75;
         const stageW = app.renderer.width - 2*padding;
         const stageH = app.renderer.height - 2*padding;
     
         const planetTexture = PIXI.Texture.from('/assets/images/earth.svg');
         const rocketTexture = PIXI.Texture.from('/assets/images/rocket.svg');
+        const font = PIXI.BitmapFont.from("LabelFont", {
+            fontSize: 12,
+        });
     
         const scale = Math.min((stageW / sceneBox.w), (stageH / sceneBox.h));
     
@@ -34,6 +37,23 @@ export class Visualizer {
             sprite.width = 50;
             sprite.height = 50;
             app.stage.addChild(sprite);
+
+            const label = new PIXI.BitmapText(planet.name, {
+                fontName: "LabelFont",
+            });
+            label.anchor = 0.5;
+            label.x = sprite.x;
+            label.y = sprite.y + 35;
+            app.stage.addChild(label);
+
+            const shipCount = new PIXI.BitmapText(
+                planet.ship_count.toString(),
+                { fontName: "LabelFont" },
+            );
+            shipCount.anchor = 0.5;
+            shipCount.x = sprite.x;
+            shipCount.y = sprite.y + 50;
+            app.stage.addChild(shipCount);
         });
     
         gameState.expeditions.forEach((exp: Expedition) => {
@@ -57,6 +77,15 @@ export class Visualizer {
             rocket.y = padding + (y - sceneBox.y) * scale;
             rocket.rotation = angle;
             app.stage.addChild(rocket);
+
+            const shipCount = new PIXI.BitmapText(
+                exp.ship_count.toString(),
+                { fontName: "LabelFont" },
+            );
+            shipCount.anchor = 0.5;
+            shipCount.x = rocket.x;
+            shipCount.y = rocket.y + 30;
+            app.stage.addChild(shipCount);
         });
     
     }
