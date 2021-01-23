@@ -1,6 +1,8 @@
 import { createWebHistory, createRouter } from "vue-router";
 import HelloWorld from '../components/HelloWorld.vue'
 import MatchViewer from '../components/MatchViewer.vue'
+import Lobbies from '../components/lobbies/Lobbies.vue'
+import Lobby from '../components/lobbies/Lobby.vue'
 
 const routes = [
     {
@@ -15,6 +17,16 @@ const routes = [
         path: '/matches/:id',
         name: 'MatchViewer',
         component: MatchViewer,
+    },
+    {
+        path: '/lobbies',
+        name: 'Lobbies',
+        component: Lobbies,
+    },
+    {
+        path: "/lobbies/:lobbyId",
+        name: 'lobby',
+        component: Lobby,
     }
 ];
 
