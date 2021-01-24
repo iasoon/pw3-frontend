@@ -1,17 +1,23 @@
 import { createWebHistory, createRouter } from "vue-router";
-import HelloWorld from '../components/HelloWorld.vue'
-import MatchViewer from '../components/MatchViewer.vue'
-import Lobbies from '../components/lobbies/Lobbies.vue'
-import Lobby from '../components/lobbies/Lobby.vue'
+import HelloWorld from '../components/HelloWorld.vue';
+import MatchViewer from '../components/MatchViewer.vue';
+import Lobbies from '../components/lobbies/Lobbies.vue';
+import Lobby from '../components/lobbies/Lobby.vue';
+import Connect from '../components/connect/Connect.vue';
 
 const routes = [
     {
         path: '/',
-        name: "Home",
+        name: 'Home',
         component: HelloWorld,
         props: {
             msg: "hallo test",
         }
+    },
+    {
+        path: '/connect',
+        name: 'Connect',
+        component: Connect,
     },
     {
         path: '/matches/:id',
