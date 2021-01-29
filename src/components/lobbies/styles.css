@@ -1,0 +1,38 @@
+.player-list {
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    max-width: 600px;
+    margin: auto;
+}
+
+.list-player {
+    display: flex;
+    padding: 3pt;
+}
+
+.list-player:hover {
+    background: lightgray;
+}
+
+.addPlayer {
+    display: flex;
+    padding: 3pt;
+}
+
+.player-name {
+    flex-grow: 1;
+}
+
+.player-status {
+    flex-grow: 0;
+}
+
+.status-accepted {
+    color: green;
+}
+
+.status-pending {
+    color: gray;
+}

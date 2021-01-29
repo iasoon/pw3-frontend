@@ -3,59 +3,30 @@
   <ul class= "player-list">
     <li class="list-player" v-for="(player, ix) in players" :key="ix">
       <span class="player-name">
-        {{ player.name }}
+        {{ player.name || "[open]" }}
       </span>
-      <span class="player-status status-accepted" v-if="player.accepted">[accepted]</span>
-      <span class="player-status status-pending" v-if="!player.accepted">[waiting]</span>
       <span class="player-remove" v-on:click="removePlayer(ix)">remove</span>
     </li>
     <li class=addPlayer>
-      <input class="addPlayer-name" v-model="addPlayerName"/>
+      <select class="addPlayer-name" v-model="addPlayerName">
+        <option value=null> [Open for all] </option>
+        <option v-for="player in lobby.players" :value="player.name" :key="player.name">
+          {{ player.name }}
+        </option>
+      </select>
       <button class="addPlayer-button" v-on:click="addPlayer" :disabled="addPlayerDisabled()">add player</button>
     </li>
   </ul>
+  <button>Send</button>
 </div>
 </template>
 
 <style scoped>
+@import "styles.css";
+
 .box {
+  margin: auto;
   max-width: 600px;
-}
-.player-list {
-  list-style: none;
-  display: flex;
-  flex-direction: column;;
-  width: 100%;
-}
-
-.list-player {
-  display: flex;
-  padding: 3pt;
-}
-
-.list-player:hover {
-  background: lightgray;
-}
-
-.addPlayer {
-  display: flex;
-  padding: 3pt;
-}
-
-.player-name {
-  flex-grow: 1;
-}
-
-.player-status {
-  flex-grow: 0;
-}
-
-.status-accepted {
-  color: green;
-}
-
-.status-pending {
-  color: gray;
 }
 
 .player-remove {
@@ -77,38 +48,27 @@
 <script lang="ts">
 export default {
   name: 'MatchForm',
+  props: {
+    lobby: Object,
+  },
   data() {
     return {
-      addPlayerName: "",
-      players: [
-        {
-          name: "bob",
-          accepted: true,
-        },
-        {
-          name: "fred",
-          accepted: true,
-        },
-        {
-          name: "bobby",
-          accepted: false,
-        }
-      ]
+      addPlayerName: null,
+      players: [],
     }
   },
   methods: {
     addPlayer() {
       this.players.push({
         name: this.addPlayerName,
-        accepted: false,
       });
-      this.addPlayerName = "";
+      this.addPlayerName = null;
     },
     removePlayer(ix: number) {
       this.players.splice(ix, 1);
     },
     addPlayerDisabled() {
-      return this.addPlayerName == "";
+      false
     }
   }
 };
