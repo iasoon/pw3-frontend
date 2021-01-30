@@ -13,6 +13,8 @@
 <script lang="ts">
 import axios from 'redaxios';
 
+import { socket } from '../../websocket';
+
 export default {
   data() {
     const player = this.$store.state.lobby.lobby.player;
@@ -40,6 +42,11 @@ export default {
       const lobbyId = this.$route.params.lobbyId;
       axios.post(`/api/lobbies/${lobbyId}/join`, player).then((response) => {
         this.$store.commit('setLobbyPlayer', player);
+          socket.send(JSON.stringify({
+            type: 'connect',
+            lobbyId: lobbyId,
+            token: this.token,
+          }));
       });
     }
   }

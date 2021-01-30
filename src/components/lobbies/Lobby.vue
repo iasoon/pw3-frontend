@@ -17,7 +17,7 @@
       <match-form v-bind:lobby="lobby" />
     </div>
     <div v-if="viewMode == 'proposal'">
-      <match-proposal v-else v-bind:proposal="lobby.invites[viewState.selectedProposal]"/>
+      <match-proposal v-bind:proposal="lobby.invites[viewState.selectedProposal]"/>
     </div>
   </div>
 

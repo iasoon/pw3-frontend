@@ -3,7 +3,6 @@ import HelloWorld from '../components/HelloWorld.vue';
 import MatchViewer from '../components/MatchViewer.vue';
 import Lobbies from '../components/lobbies/Lobbies.vue';
 import Lobby from '../components/lobbies/Lobby.vue';
-import Connect from '../components/connect/Connect.vue';
 
 const routes = [
     {
@@ -13,11 +12,6 @@ const routes = [
         props: {
             msg: "hallo test",
         }
-    },
-    {
-        path: '/connect',
-        name: 'Connect',
-        component: Connect,
     },
     {
         path: '/matches/:id',

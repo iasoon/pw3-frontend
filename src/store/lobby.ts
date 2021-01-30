@@ -14,14 +14,13 @@ export const lobbyStore = {
     },
     mutations: {
         setLobbyPlayer(state: LobbyState, player: Player) {
-            if (state.lobby) {
-                state.lobby.player = player;
-            }
+            state.lobby.player = player;
         },
         storeLobby(state: LobbyState, lobby: any) {
-            if (state.lobby) {
-                state.lobby.data = lobby;
-            }
+            state.lobby.data = lobby;
+        },
+        updatePlayer(state: LobbyState, player: any) {
+            state.lobby.data.players[player.name] = player;
         }
     }
 };
