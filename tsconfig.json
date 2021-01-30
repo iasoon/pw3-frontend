@@ -9,7 +9,13 @@
       "module": "esnext",
       "moduleResolution": "node",
       "allowSyntheticDefaultImports": true,
+      "baseUrl": ".",
+      "paths": {
+        "@/*": [
+          "./src/*"
+        ]
+      }
     },
-    "include": ["src/**/*.ts", "src/**/*.vue", "tests/**/*.ts"],
+    "include": ["src/**/*"],
     "exclude": ["node_modules"]
   }

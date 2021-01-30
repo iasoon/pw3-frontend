@@ -21,6 +21,12 @@ export const lobbyStore = {
         },
         updatePlayer(state: LobbyState, player: any) {
             state.lobby.data.players[player.name] = player;
+        },
+        updateProposal(state: LobbyState, proposal: any) {
+            if (!state.lobby.data.proposals) {
+                state.lobby.data.proposals = {};
+            }
+            state.lobby.data.proposals[proposal.id] = proposal;
         }
     }
 };

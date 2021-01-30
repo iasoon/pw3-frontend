@@ -2,7 +2,7 @@ import { createStore, Store } from 'vuex';
 import axios from 'redaxios';
 import {lobbyStore as lobby, LobbyState} from './lobby';
 
-type State = {
+export type State = {
     lobby: LobbyState,
 }
 
