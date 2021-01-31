@@ -19,7 +19,7 @@
     <div v-if="viewMode == 'proposal'">
       <match-proposal v-bind:proposal="lobby.proposals[selectedProposal]"/>
     </div>
-    <div class="" v-if="viewMode == 'match'">
+    <div class="fillHeight" v-if="viewMode == 'match'">
       <match-viewer v-bind:matchId="selectedMatch" />
     </div>
   </div>
@@ -51,6 +51,11 @@
   display: flex;
   width: 100vw;
   height: 100vh;
+  overflow-y: hidden;
+}
+
+.fillHeight {
+  height: 100%;
 }
 
 .view {
@@ -66,14 +71,18 @@
 
 .sidebar-left {
   width: 200px;
-  background-color: darkgray;
+  background-color: #000;
+  color: #ccc;
+  overflow: hidden;
 }
 
 .sidebar-right {
   width: 20%;
   max-width: 400px;
   min-width: 200px;
-  background-color: darkgray;
+  background-color: #000;
+  color: #ccc;
+  overflow: hidden;
 }
 
 .invite-list {
