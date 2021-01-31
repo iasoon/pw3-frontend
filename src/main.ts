@@ -4,7 +4,7 @@ import router from './router';
 import store from './store';
 import './index.css'
 import { socket } from './websocket';
-import init, {Game} from 'planetwars';
+import init, {Game} from 'planetwars-rs';
 
 init().then(m => {
     console.log("Wasm loaded, let's start the app")

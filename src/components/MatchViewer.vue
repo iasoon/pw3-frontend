@@ -1,16 +1,30 @@
 <template>
-    <canvas ref="canvas"/>
-    <input
-        type="range"
-        min="0"
-        v-bind:max="sliderMax"
-        step="1"
-        v-model="turnNum"
-    />
+  <div id="main" class="loading">
+    <canvas id="canvas"></canvas>
+    <div id="name"></div>
+    <div id="addbutton" class="button"></div>
+
+    <div id="meta">
+      <div id="turnCounter">
+        0 / 0
+      </div>
+      <div>
+        <span>Ms per frame:&nbsp;</span>
+        <input type="number" id="speed" value="100">
+      </div>
+      <div class="slidecontainer">
+        <input type="range" min="0" max="1" value="1" class="slider" id="turnSlider">
+      </div>
+    </div>
+  </div>
 </template>
 
+<style scoped>
+  @import '../visualizer/style.css';
+</style>
+
 <script lang="ts">
-import * as visualizer from '../visualizer';
+import * as vis from '../visualizer/index.ts';
 
 function parseMatchLog(entries) {
     return entries.map(e => JSON.parse(e));
@@ -21,20 +35,16 @@ export default {
     data() {
         return {
             loading: true,
-            error: false,
-            matchData: null,
-            turnNum: 0,
-            sliderMax: 0,
         }
     },
     created() {
         this.fetchData();
     },
     mounted() {
-        this.visualizer = new visualizer.Visualizer(this.$refs.canvas);
+        vis.init();
+        vis.set_game_name('sup');
     },
     updated() {
-        this.renderScene();
     },
     methods: {
         fetchData() {
@@ -47,18 +57,11 @@ export default {
             fetch(`/api/matches/${matchId}`)
                 .then(resp => resp.json())
                 .then(data => {
-                    this.matchData = parseMatchLog(data);
-                    this.sliderMax = this.matchData.length - 1;
-                    this.loading = false;
-                    this.renderScene();
+                    let str = data.join('\n');
+                    vis.set_instance(str);
                 })
                 .catch(err => { throw(err) });
         },
-
-        renderScene() {
-            const state = this.matchData[this.turnNum];
-            this.visualizer.render(state);
-        }
     }
 }
 </script>
