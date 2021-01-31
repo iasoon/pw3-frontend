@@ -11,12 +11,12 @@ const config = {
         }
     },
     optimizeDeps: {
-        'exclude': 'planetwars'
+        'exclude': 'planetwars-rs'
     },
     plugins: [
         rust({
             crates: {
-                planetwars: './Planetwars/frontend',
+                'planetwars-rs': './visualiser',
             }
         }),
     ]
