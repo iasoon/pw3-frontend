@@ -9,25 +9,24 @@
     </li>
     <li class=addPlayer>
       <select class="addPlayer-name" v-model="addPlayerName">
-        <option value=null> [Open for all] </option>
+        <!-- <option value=null> [Open for all] </option> -->
         <option v-for="player in lobby.players" :value="player.name" :key="player.name">
           {{ player.name }}
         </option>
       </select>
-      <button class="addPlayer-button" v-on:click="addPlayer" :disabled="addPlayerDisabled()">add player</button>
+      <button class="addPlayer-button" v-on:click="addPlayer" :disabled="addPlayerButtonDisabled()">
+        add player
+      </button>
     </li>
   </ul>
-  <button>Send</button>
+  <button class="submitButton" v-on:click="submit" :disabled="sendButtonDisabled()">
+    Send
+  </button>
 </div>
 </template>
 
 <style scoped>
 @import "styles.css";
-
-.box {
-  margin: auto;
-  max-width: 600px;
-}
 
 .player-remove {
   padding: 0;
@@ -43,9 +42,12 @@
 .addPlayer-button {
   border: 1px solid black;
 }
+
 </style>
 
 <script lang="ts">
+import axios from 'redaxios';
+
 export default {
   name: 'MatchForm',
   props: {
@@ -53,22 +55,52 @@ export default {
   },
   data() {
     return {
-      addPlayerName: null,
+      addPlayerName: this.addPlayerDefault(),
       players: [],
+      submitted: false,
     }
   },
   methods: {
+    addPlayerDefault(): string | undefined {
+      return this.$store.state.lobby.lobby?.player?.name;
+    },
     addPlayer() {
       this.players.push({
         name: this.addPlayerName,
       });
-      this.addPlayerName = null;
     },
     removePlayer(ix: number) {
       this.players.splice(ix, 1);
     },
-    addPlayerDisabled() {
-      false
+    submit() {
+      if (!this.lobby) {
+        throw "no lobby given";
+      }
+      this.submitted = true;
+
+      const player = this.$store.state.lobby.lobby?.player;
+      axios.post(`/api/lobbies/${this.lobby.id}/proposals`, {
+        owner: player?.name,
+        config: {
+          'map_file': 'hex.json',
+          'max_turns': 300,
+        },
+        players: this.players.map(p => p.name),
+      }, {
+        headers: {
+          'Authorization': `Bearer ${player?.token}` 
+        }
+      }).then(resp => {
+        console.log(resp);
+        this.$store.commit('updateProposal', resp.data);
+        this.$emit('created', resp.data.id);
+      })
+    },
+    addPlayerButtonDisabled() {
+      return !this.addPlayerName;
+    },
+    sendButtonDisabled() {
+      return this.submitted;
     }
   }
 };

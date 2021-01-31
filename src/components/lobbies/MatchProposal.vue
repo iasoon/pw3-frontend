@@ -8,7 +8,7 @@
       <div v-if="canAccept(player) && !player.accepted">
         <button v-on:click="accept(ix)" class="button-accept">Accept</button>
       </div>
-      <div v-else-if="player.name == playerName && player.accepted">
+      <div v-else-if="player.name == me && player.accepted">
         <span class="player-accepted">Accepted</span>
       </div>
       <div v-else>
@@ -17,20 +17,22 @@
       </div>
     </li>
   </ul>
+  <button v-if="proposal.owner == me" v-on:click="start" :disabled="startButtonDisabled()">
+    Start
+  </button>
 </div>
 </template>
 
 <style scoped>
 @import "./styles.css";
 .button-accept {
-  color: green;
+  color: black;
   border-width: 0px;
 }
 </style>
 
 <script lang="ts">
-
-const ME = "iasoon";
+import axios from 'redaxios';
 
 export default {
   props: {
@@ -38,10 +40,18 @@ export default {
   },
   data() {
     return {
-      // this should come from store
-      playerName: ME,
-      owner: this.proposal?.owner,
-      players: this.proposal?.players,
+      started: false,
+    }
+  },
+  computed: {
+    me(): string | undefined {
+      return this.$store.state.lobby.lobby?.player?.name;
+    },
+    owner() : string {
+      return this.proposal?.owner;
+    },
+    players(): any {
+      return this.proposal?.players;
     }
   },
   methods: {
@@ -49,7 +59,24 @@ export default {
       this.players[ix].accepted = true;
     },
     canAccept(player: any) {
-      this.playerName === player.name || player.name === null
+      return this.me === player.name || player.name === null;
+    },
+    startButtonDisabled() {
+      return this.started;
+    },
+    start() {
+      const lobbyId = this.$store.state.lobby.lobby.data.id;
+      const proposalId = this.proposal?.id;
+      const player = this.$store.state.lobby.lobby.player;
+      this.started = true;
+      axios.post(`/api/lobbies/${lobbyId}/proposals/${proposalId}/start`, {}, {
+        headers: {
+          'Authorization': `Bearer ${player?.token}` 
+        }
+      }).then(resp => {
+        // TODO
+        this.$store.commit('saveMatch', {id: resp.data.match_id });
+      })
     }
   }
 };

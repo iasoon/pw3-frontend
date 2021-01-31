@@ -14,10 +14,10 @@
 
   <div class="view">
     <div v-if="viewMode == 'matchForm'">
-      <match-form v-bind:lobby="lobby" />
+      <match-form v-bind:lobby="lobby" v-on:created="viewProposal" />
     </div>
     <div v-if="viewMode == 'proposal'">
-      <match-proposal v-bind:proposal="lobby.invites[viewState.selectedProposal]"/>
+      <match-proposal v-bind:proposal="lobby.proposals[selectedProposal]"/>
     </div>
   </div>
 
@@ -29,7 +29,7 @@
     </div>
     Invites:
     <ul class="invite-list">
-      <li v-for="(proposal, ix) in lobby.invites" :key=proposal.id v-on:click="viewProposal(ix)">
+      <li v-for="proposal in lobby.proposals" :key=proposal.id v-on:click="viewProposal(proposal.id)">
         {{proposal.id}}
       </li>
     </ul>
@@ -112,9 +112,9 @@ export default {
     }
   },
   methods: {
-    viewProposal(ix: number) {
+    viewProposal(id: any) {
       this.viewMode = 'proposal';
-      this.selectedProposal = ix;
+      this.selectedProposal = id;
     },
     showMatchForm() {
       this.viewMode = 'matchForm';

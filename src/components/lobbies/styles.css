@@ -1,3 +1,8 @@
+.box {
+    margin: auto;
+    max-width: 600px;
+}
+  
 .player-list {
     padding: 0;
     list-style: none;
