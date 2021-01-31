@@ -19,6 +19,9 @@
     <div v-if="viewMode == 'proposal'">
       <match-proposal v-bind:proposal="lobby.proposals[selectedProposal]"/>
     </div>
+    <div class="" v-if="viewMode == 'match'">
+      <match-viewer v-bind:matchId="selectedMatch" />
+    </div>
   </div>
 
   <div class="sidebar-right">
@@ -35,7 +38,7 @@
     </ul>
     Matches:
     <ul class="match-list">
-      <li v-for="match in lobby.matches" :key=match.id>
+      <li v-for="match in lobby.matches" :key=match.id v-on:click="viewMatch(match.id)">
         {{match.id}}
       </li>
     </ul>
@@ -49,6 +52,7 @@
   width: 100vw;
   height: 100vh;
 }
+
 .view {
   flex-grow: 1;
 }
@@ -87,16 +91,18 @@ import axios from "redaxios";
 import MatchForm from "./MatchForm.vue";
 import MatchProposal from "./MatchProposal.vue";
 import Connect from "./Connect.vue"
+import MatchViewer from "../MatchViewer.vue";
 
 import { useStore } from 'vuex'
 
 export default {
-  components: { MatchForm, MatchProposal, Connect },
+  components: { MatchForm, MatchProposal, Connect, MatchViewer},
   name: "Lobby",
   data() {
     return {
       viewMode: 'loading',
       selectedProposal: null,
+      selectedMatch: null,
     };
   },
   created() {
@@ -115,6 +121,10 @@ export default {
     viewProposal(id: any) {
       this.viewMode = 'proposal';
       this.selectedProposal = id;
+    },
+    viewMatch(id: any) {
+      this.viewMode = 'match';
+      this.selectedMatch = id;
     },
     showMatchForm() {
       this.viewMode = 'matchForm';

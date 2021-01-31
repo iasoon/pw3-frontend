@@ -26,12 +26,15 @@
 <script lang="ts">
 import * as vis from '../visualizer/index.ts';
 
-function parseMatchLog(entries) {
+function parseMatchLog(entries: string[]) {
     return entries.map(e => JSON.parse(e));
 }
 
 export default {
     name: 'MatchViewer',
+    props: {
+      matchId: String,
+    },
     data() {
         return {
             loading: true,
@@ -45,20 +48,19 @@ export default {
         vis.set_game_name('sup');
     },
     updated() {
+      this.fetchData();
     },
     methods: {
         fetchData() {
             this.loading = true;
-            this.error = false;
-            this.matchData = null;
-            const matchId = this.$route.params.id
 
             const a = this;
-            fetch(`/api/matches/${matchId}`)
+            fetch(`/api/matches/${this.matchId}`)
                 .then(resp => resp.json())
                 .then(data => {
                     let str = data.join('\n');
                     vis.set_instance(str);
+                    this.loading = false;
                 })
                 .catch(err => { throw(err) });
         },
