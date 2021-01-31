@@ -1,0 +1,3 @@
+[submodule "Planetwars"]
+	path = Planetwars
+	url = https://github.com/ZeusWPI/Planetwars
