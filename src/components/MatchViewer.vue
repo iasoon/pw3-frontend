@@ -16,6 +16,7 @@
         <input type="range" min="0" max="1" value="1" class="slider" id="turnSlider">
       </div>
     </div>
+    <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
   </div>
 </template>
 
