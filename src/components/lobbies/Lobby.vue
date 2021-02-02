@@ -20,7 +20,7 @@
       <match-proposal v-bind:proposal="lobby.proposals[selectedProposal]"/>
     </div>
     <div class="fillHeight" v-if="viewMode == 'match'">
-      <match-viewer v-bind:matchId="selectedMatch" />
+      <match-viewer v-bind:match="selectedMatch" />
     </div>
   </div>
 
@@ -52,6 +52,7 @@
   width: 100vw;
   height: 100vh;
   overflow-y: hidden;
+  background-color: #000;
 }
 
 .fillHeight {
@@ -71,7 +72,6 @@
 
 .sidebar-left {
   width: 200px;
-  background-color: #000;
   color: #ccc;
   overflow: hidden;
 }
@@ -80,7 +80,6 @@
   width: 20%;
   max-width: 400px;
   min-width: 200px;
-  background-color: #000;
   color: #ccc;
   overflow: hidden;
 }
@@ -111,7 +110,7 @@ export default {
     return {
       viewMode: 'loading',
       selectedProposal: null,
-      selectedMatch: null,
+      selectedMatchId: null,
     };
   },
   created() {
@@ -124,6 +123,10 @@ export default {
     isConnected() {
       const lobbyState = this.$store.state.lobby;
       return lobbyState.lobby && lobbyState.lobby.player;
+    },
+    selectedMatch() {
+      if (!this.selectedMatchId) return undefined;
+      return this.$store.state.lobby.lobby.data?.matches[this.selectedMatchId];
     }
   },
   methods: {
@@ -133,7 +136,7 @@ export default {
     },
     viewMatch(id: any) {
       this.viewMode = 'match';
-      this.selectedMatch = id;
+      this.selectedMatchId = id;
     },
     showMatchForm() {
       this.viewMode = 'matchForm';

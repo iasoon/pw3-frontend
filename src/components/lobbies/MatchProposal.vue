@@ -5,18 +5,19 @@
       <span class="player-name">
         {{ player.name }}
       </span>
-      <div v-if="canAccept(player) && !player.accepted">
-        <button v-on:click="accept(ix)" class="button-accept">Accept</button>
-      </div>
-      <div v-else-if="player.name == me && player.accepted">
-        <span class="player-accepted">Accepted</span>
-      </div>
-      <div v-else>
-        <span class="player-status status-pending" v-if="!player.accepted">[pending]</span>
-        <span class="player-status status-accepted" v-if="player.accepted">[accepted]</span>
+      <div>
+        <span class="player-status status-pending" v-if="player.status == 'Unanswered'">[pending]</span>
+        <span class="player-status status-accepted" v-if="player.status == 'Accepted'">[accepted]</span>
+        <span class="player-status status-declined" v-if="player.status == 'Rejected'">[declined]</span>
       </div>
     </li>
   </ul>
+  <button class="button button-accept" v-on:click="accept()" :disabled="!canAccept()" >
+    Accept
+  </button>
+  <button v-on:click="decline()" class="button button-decline">
+    Decline
+  </button>
   <button v-if="proposal.owner == me" v-on:click="start" :disabled="startButtonDisabled()">
     Start
   </button>
@@ -25,9 +26,25 @@
 
 <style scoped>
 @import "./styles.css";
+
+.button {
+  padding: 5px 16px;
+  border: 0;
+  border-radius: 5px;
+}
+
 .button-accept {
-  color: black;
-  border-width: 0px;
+  color: white;
+  background-color: green;
+}
+
+.button-accept:disabled {
+  background-color: lightgray;
+}
+
+.button-decline {
+  color: white;
+  background-color: red;
 }
 </style>
 
@@ -55,14 +72,38 @@ export default {
     }
   },
   methods: {
-    accept(ix: number) {
-      this.players[ix].accepted = true;
+    canAccept() {
+      return this.players.some((player: any) => player.name == this.me && player.status == 'Unanswered');
     },
-    canAccept(player: any) {
-      return this.me === player.name || player.name === null;
+    canStart() {
+      return this.players.every((player: any) => player.status == 'Accepted');
     },
     startButtonDisabled() {
-      return this.started;
+      return this.started || !this.canStart();
+    },
+    accept() {
+      this.updateAcceptedStatus('Accepted');
+    },
+    decline() {
+      this.updateAcceptedStatus('Rejected');
+    },
+    updateAcceptedStatus(status: string) {
+      const lobbyId = this.$store.state.lobby.lobby.data.id;
+      const proposalId = this.proposal?.id;
+      const player = this.$store.state.lobby.lobby.player;
+
+      axios.post(`/api/lobbies/${lobbyId}/proposals/${proposalId}/accept`, {
+        name: player?.name,
+        status: status,
+      }, {
+        headers: {
+          'Authorization': `Bearer ${player?.token}` 
+        }
+      }).then(resp => {
+        this.$store.commit('updateProposal', resp.data);
+        console.log(resp.data);
+      })
+
     },
     start() {
       const lobbyId = this.$store.state.lobby.lobby.data.id;
@@ -75,7 +116,7 @@ export default {
         }
       }).then(resp => {
         // TODO
-        this.$store.commit('saveMatch', {id: resp.data.match_id });
+        this.$store.commit('updateProposal', resp.data);
       })
     }
   }

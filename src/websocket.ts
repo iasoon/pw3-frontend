@@ -19,5 +19,11 @@ const HANDLER_MAP: {[type: string]: (data: any) => void } = {
     },
     playerData(data: any) {
         store.commit('updatePlayer', data);
+    },
+    proposalData(data: any) {
+        store.commit('updateProposal', data);
+    },
+    matchData(data: any) {
+        store.commit('updateMatch', data);
     }
 };

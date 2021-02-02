@@ -41,3 +41,7 @@
 .status-pending {
     color: gray;
 }
+
+.status-declined {
+    color: red;
+}

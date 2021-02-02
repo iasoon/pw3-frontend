@@ -33,7 +33,7 @@ function parseMatchLog(entries: string[]) {
 export default {
     name: 'MatchViewer',
     props: {
-      matchId: String,
+      match: Object,
     },
     data() {
         return {
@@ -53,9 +53,12 @@ export default {
     methods: {
         fetchData() {
             this.loading = true;
+            if (this.match?.status !== 'done') {
+              return;
+            }
 
             const a = this;
-            fetch(`/api/matches/${this.matchId}`)
+            fetch(`/api/matches/${this.match.id}`)
                 .then(resp => resp.json())
                 .then(data => {
                     let str = data.join('\n');

@@ -28,7 +28,7 @@ export const lobbyStore = {
             }
             state.lobby.data.proposals[proposal.id] = proposal;
         },
-        saveMatch(state: LobbyState, match: any) {
+        updateMatch(state: LobbyState, match: any) {
             if (!state.lobby.data.matches) {
                 state.lobby.data.matches = {};
             }
