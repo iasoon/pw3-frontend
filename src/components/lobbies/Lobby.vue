@@ -26,8 +26,8 @@
 
   <div class="sidebar-right">
     <div>
-      <button v-on:click="showMatchForm()">
-        create match
+      <button v-on:click="showMatchForm()" class="button-create-match">
+        new game
       </button>
     </div>
     Invites:
@@ -38,7 +38,7 @@
     </ul>
     Matches:
     <ul class="match-list">
-      <li v-for="match in lobby.matches" :key=match.id v-on:click="viewMatch(match.id)" class="match-li">
+      <li v-for="match in orderedMatches" :key=match.id v-on:click="viewMatch(match.id)" class="match-li">
         {{showTimestamp(match.timestamp)}} {{match.config.map_file}}
         <ul class="match-player-list">
           <li v-for="(player, ix) in match.players" :key="ix" v-bind:style="{ color: playerColor(ix) }" class="match-player">
@@ -69,6 +69,17 @@
 }
 .player-list {
   list-style: none;
+}
+
+.button-create-match {
+  background-color: #cc5900;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 0;
+  font-size: 18pt;
+  display: block;
+  margin: 20px auto;
 }
 
 .player {
@@ -107,6 +118,10 @@
   padding: 0;
 }
 
+.match-li {
+  padding: .5em;
+}
+
 .match-li:hover {
   background-color: #333;
 }
@@ -118,7 +133,7 @@
 <script lang="ts">
 import axios from "redaxios";
 import MatchForm from "./MatchForm.vue";
-import MatchProposal from "./MatchProposal.vue";
+import MatchProposal from "./MatchProposal.vue";  
 import Connect from "./Connect.vue"
 import MatchViewer from "../MatchViewer.vue";
 
@@ -162,7 +177,12 @@ export default {
       return this.$store.state.lobby.lobby.data?.matches[this.selectedMatchId];
     },
     openProposals() {
-      return Object.values(this.lobby.proposals).filter(p => p.status === 'pending');
+      const lobby = this.$store.state.lobby.lobby.data;
+      return Object.values(lobby.proposals).filter(p => p.status === 'pending');
+    },
+    orderedMatches() {
+      const lobby = this.$store.state.lobby.lobby.data;
+      return Object.values(lobby.matches).sort((a:any, b:any) => (new Date(a.timestamp) < new Date(b.timestamp)) ? 1 : -1)
     }
   },
   methods: {
