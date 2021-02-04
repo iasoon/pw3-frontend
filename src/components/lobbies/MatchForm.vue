@@ -91,7 +91,6 @@ export default {
           'Authorization': `Bearer ${player?.token}` 
         }
       }).then(resp => {
-        console.log(resp);
         this.$store.commit('updateProposal', resp.data);
         this.$emit('created', resp.data.id);
       })

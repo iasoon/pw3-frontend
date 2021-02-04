@@ -116,6 +116,7 @@ export default {
         }
       }).then(resp => {
         // TODO
+        console.log(resp);
         this.$store.commit('updateProposal', resp.data);
       })
     }

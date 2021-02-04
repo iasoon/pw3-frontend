@@ -32,14 +32,19 @@
     </div>
     Invites:
     <ul class="invite-list">
-      <li v-for="proposal in lobby.proposals" :key=proposal.id v-on:click="viewProposal(proposal.id)">
-        {{proposal.id}}
+      <li v-for="proposal in openProposals" :key=proposal.id v-on:click="viewProposal(proposal.id)" class="invite-li">
+        {{proposal.owner}} {{proposal.config.map_file}}
       </li>
     </ul>
     Matches:
     <ul class="match-list">
-      <li v-for="match in lobby.matches" :key=match.id v-on:click="viewMatch(match.id)">
-        {{match.id}}
+      <li v-for="match in lobby.matches" :key=match.id v-on:click="viewMatch(match.id)" class="match-li">
+        {{showTimestamp(match.timestamp)}} {{match.config.map_file}}
+        <ul class="match-player-list">
+          <li v-for="(player, ix) in match.players" :key="ix" v-bind:style="{ color: playerColor(ix) }" class="match-player">
+            {{player}}
+          </li>
+        </ul>
       </li>
     </ul>
   </div>
@@ -85,12 +90,28 @@
 }
 
 .invite-list {
+  padding: 0;
   list-style: none;
+}
+
+.invite-li {
+  padding: 0 3px;
+}
+
+.invite-li:hover {
+  background-color: #333;
 }
 
 .match-list {
   list-style: none;
+  padding: 0;
 }
+
+.match-li:hover {
+  background-color: #333;
+}
+
+
 </style>
 
 
@@ -102,6 +123,18 @@ import Connect from "./Connect.vue"
 import MatchViewer from "../MatchViewer.vue";
 
 import { useStore } from 'vuex'
+
+const PLAYER_COLORS = [
+  "#FF8000",
+  "#0080ff",
+  "#FF6693",
+  "#3fcb55",
+  "#cbc33f",
+  "#cf40e9",
+  "#FF3F0D",
+  "#1beef0",
+  "#0DC5FF",
+];
 
 export default {
   components: { MatchForm, MatchProposal, Connect, MatchViewer},
@@ -127,9 +160,19 @@ export default {
     selectedMatch() {
       if (!this.selectedMatchId) return undefined;
       return this.$store.state.lobby.lobby.data?.matches[this.selectedMatchId];
+    },
+    openProposals() {
+      return Object.values(this.lobby.proposals).filter(p => p.status === 'pending');
     }
   },
   methods: {
+    showTimestamp(dateStr: string): string {
+      const date = new Date(dateStr);
+      return `${date.getHours()}:${date.getMinutes()}`;
+    },
+    playerColor(num: number): string {
+      return PLAYER_COLORS[num % PLAYER_COLORS.length];
+    },
     viewProposal(id: any) {
       this.viewMode = 'proposal';
       this.selectedProposal = id;

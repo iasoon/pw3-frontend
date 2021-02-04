@@ -25,7 +25,7 @@
 </style>
 
 <script lang="ts">
-import * as vis from '../visualizer/index.ts';
+import * as vis from '../visualizer/index';
 
 function parseMatchLog(entries: string[]) {
     return entries.map(e => JSON.parse(e));
