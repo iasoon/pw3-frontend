@@ -207,7 +207,6 @@ export default {
     fetchLobbyData() {
       const lobbyId = this.$route.params.lobbyId;
       axios.get(`/api/lobbies/${lobbyId}`).then((response) => {
-        console.log(response.data);
         this.$store.commit('storeLobby', response.data);
         this.viewMode = 'ready';
       });

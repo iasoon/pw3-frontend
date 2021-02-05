@@ -100,7 +100,6 @@ export default {
         { headers: { 'Authorization': `Bearer ${player?.token}` } }
       ).then(resp => {
         this.$store.commit('updateProposal', resp.data);
-        console.log(resp.data);
       })
 
     },

@@ -79,7 +79,6 @@ export default {
       this.submitted = true;
 
       const player = this.$store.state.lobby.lobby?.player;
-      console.log(player);
       axios.post(`/api/lobbies/${this.lobby.id}/proposals`, {
         owner: player?.name,
         config: {
