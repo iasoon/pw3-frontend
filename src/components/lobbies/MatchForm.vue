@@ -3,14 +3,14 @@
   <ul class= "player-list">
     <li class="list-player" v-for="(player, ix) in players" :key="ix">
       <span class="player-name">
-        {{ player.name || "[open]" }}
+        {{ lobby.players[player.playerId].name || "[open]" }}
       </span>
       <span class="player-remove" v-on:click="removePlayer(ix)">remove</span>
     </li>
     <li class=addPlayer>
-      <select class="addPlayer-name" v-model="addPlayerName">
+      <select class="addPlayer-name" v-model="selectedPlayer">
         <!-- <option value=null> [Open for all] </option> -->
-        <option v-for="player in lobby.players" :value="player.name" :key="player.name">
+        <option v-for="player in lobby.players" :value="player.id" :key="player.id">
           {{ player.name }}
         </option>
       </select>
@@ -55,18 +55,18 @@ export default {
   },
   data() {
     return {
-      addPlayerName: this.addPlayerDefault(),
+      selectedPlayer: this.defaultSelected(),
       players: [],
       submitted: false,
     }
   },
   methods: {
-    addPlayerDefault(): string | undefined {
-      return this.$store.state.lobby.lobby?.player?.name;
+    defaultSelected(): string | undefined {
+      return this.$store.state.lobby.lobby?.player?.id;
     },
     addPlayer() {
       this.players.push({
-        name: this.addPlayerName,
+        playerId: this.selectedPlayer,
       });
     },
     removePlayer(ix: number) {
@@ -79,13 +79,14 @@ export default {
       this.submitted = true;
 
       const player = this.$store.state.lobby.lobby?.player;
+      console.log(player);
       axios.post(`/api/lobbies/${this.lobby.id}/proposals`, {
         owner: player?.name,
         config: {
           'map_file': 'hex.json',
           'max_turns': 300,
         },
-        players: this.players.map(p => p.name),
+        players: this.players.map(p => p.playerId),
       }, {
         headers: {
           'Authorization': `Bearer ${player?.token}` 
@@ -96,7 +97,7 @@ export default {
       })
     },
     addPlayerButtonDisabled() {
-      return !this.addPlayerName;
+      return this.selectedPlayer === undefined;
     },
     sendButtonDisabled() {
       return this.submitted;

@@ -33,7 +33,7 @@
     Invites:
     <ul class="invite-list">
       <li v-for="proposal in openProposals" :key=proposal.id v-on:click="viewProposal(proposal.id)" class="invite-li">
-        {{proposal.owner}} {{proposal.config.map_file}}
+        {{lobby.players[proposal.owner_id].name}} {{proposal.config.map_file}}
       </li>
     </ul>
     Matches:
@@ -41,8 +41,8 @@
       <li v-for="match in orderedMatches" :key=match.id v-on:click="viewMatch(match.id)" class="match-li">
         {{showTimestamp(match.timestamp)}} {{match.config.map_file}}
         <ul class="match-player-list">
-          <li v-for="(player, ix) in match.players" :key="ix" v-bind:style="{ color: playerColor(ix) }" class="match-player">
-            {{player}}
+          <li v-for="(player_id, ix) in match.players" :key="ix" v-bind:style="{ color: playerColor(ix) }" class="match-player">
+            {{lobby.players[player_id].name}}
           </li>
         </ul>
       </li>

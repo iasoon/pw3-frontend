@@ -96,12 +96,15 @@ export default {
       return !nameValid || !tokenValid;
     },
     connect() {
-      const player = {
+      const playerParams = {
         name: this.name,
         token: this.token,
       };
-      axios.post(`/api/lobbies/${this.lobbyId}/join`, player).then((response) => {
-        this.$store.commit('setLobbyPlayer', player);
+      axios.post(`/api/lobbies/${this.lobbyId}/join`, playerParams).then((response) => {
+        this.$store.commit('setLobbyPlayer', {
+          ...response.data,
+          token: this.token,
+        });
           socket.send(JSON.stringify({
             type: 'connect',
             lobbyId: this.lobbyId,

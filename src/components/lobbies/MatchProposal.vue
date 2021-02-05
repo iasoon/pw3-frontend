@@ -3,7 +3,7 @@
   <ul class= "player-list">
     <li class="list-player" v-for="(player, ix) in players" :key="ix">
       <span class="player-name">
-        {{ player.name }}
+        {{ lobby.players[player.player_id].name }}
       </span>
       <div>
         <span class="player-status status-pending" v-if="player.status == 'Unanswered'">[pending]</span>
@@ -18,7 +18,7 @@
   <button v-on:click="decline()" class="button button-decline">
     Decline
   </button>
-  <button v-if="proposal.owner == me" v-on:click="start" :disabled="startButtonDisabled()">
+  <button v-if="proposal.owner_id === me.id" v-on:click="start" :disabled="startButtonDisabled()">
     Start
   </button>
 </div>
@@ -61,19 +61,22 @@ export default {
     }
   },
   computed: {
-    me(): string | undefined {
-      return this.$store.state.lobby.lobby?.player?.name;
+    me(): any | undefined {
+      return this.$store.state.lobby.lobby?.player;
     },
     owner() : string {
       return this.proposal?.owner;
     },
     players(): any {
       return this.proposal?.players;
+    },
+    lobby(): any {
+      return this.$store.state.lobby.lobby.data;
     }
   },
   methods: {
     canAccept() {
-      return this.players.some((player: any) => player.name == this.me && player.status == 'Unanswered');
+      return this.players.some((player: any) => player.player_id === this.me.id && player.status == 'Unanswered');
     },
     canStart() {
       return this.players.every((player: any) => player.status == 'Accepted');
@@ -92,14 +95,10 @@ export default {
       const proposalId = this.proposal?.id;
       const player = this.$store.state.lobby.lobby.player;
 
-      axios.post(`/api/lobbies/${lobbyId}/proposals/${proposalId}/accept`, {
-        name: player?.name,
-        status: status,
-      }, {
-        headers: {
-          'Authorization': `Bearer ${player?.token}` 
-        }
-      }).then(resp => {
+      axios.post(`/api/lobbies/${lobbyId}/proposals/${proposalId}/accept`,
+        { status: status },
+        { headers: { 'Authorization': `Bearer ${player?.token}` } }
+      ).then(resp => {
         this.$store.commit('updateProposal', resp.data);
         console.log(resp.data);
       })
