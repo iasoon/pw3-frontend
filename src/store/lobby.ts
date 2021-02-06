@@ -20,7 +20,7 @@ export const lobbyStore = {
             state.lobby.data = lobby;
         },
         updatePlayer(state: LobbyState, player: any) {
-            state.lobby.data.players[player.name] = player;
+            state.lobby.data.players[player.id] = player;
         },
         updateProposal(state: LobbyState, proposal: any) {
             if (!state.lobby.data.proposals) {

@@ -7,8 +7,9 @@
       </span>
       <div>
         <span class="player-status status-pending" v-if="player.status == 'Unanswered'">[pending]</span>
-        <span class="player-status status-accepted" v-if="player.status == 'Accepted'">[accepted]</span>
-        <span class="player-status status-declined" v-if="player.status == 'Rejected'">[declined]</span>
+        <span class="player-status status-declined" v-else-if="player.status == 'Rejected'">[declined]</span>
+        <span class="player-status status-disconnected" v-else-if="!lobby.players[player.player_id].client_connected">[not connected]</span>
+        <span class="player-status status-accepted" v-else-if="player.status == 'Accepted'">[accepted]</span>
       </div>
     </li>
   </ul>
@@ -46,6 +47,10 @@
   color: white;
   background-color: red;
 }
+
+.status-disconnected {
+  color: orange;
+}
 </style>
 
 <script lang="ts">
@@ -79,7 +84,7 @@ export default {
       return this.players.some((player: any) => player.player_id === this.me.id && player.status == 'Unanswered');
     },
     canStart() {
-      return this.players.every((player: any) => player.status == 'Accepted');
+      return this.players.every((player: any) => player.status == 'Accepted' && this.lobby.players[player.player_id].client_connected);
     },
     startButtonDisabled() {
       return this.started || !this.canStart();

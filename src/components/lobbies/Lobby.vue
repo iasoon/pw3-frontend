@@ -6,9 +6,7 @@
   <div class="sidebar-left">
     Players:
     <ul class="player-list">
-      <li v-for="player in lobby.players" :key="player.name" class="player">
-        {{ player.name }}
-      </li>
+      <player-card v-bind:player="player" v-for="player in lobby.players" :key="player.id"/>
     </ul>
   </div>
 
@@ -136,6 +134,7 @@ import MatchForm from "./MatchForm.vue";
 import MatchProposal from "./MatchProposal.vue";  
 import Connect from "./Connect.vue"
 import MatchViewer from "../MatchViewer.vue";
+import PlayerCard from "./PlayerCard.vue";
 
 import { useStore } from 'vuex'
 
@@ -152,7 +151,7 @@ const PLAYER_COLORS = [
 ];
 
 export default {
-  components: { MatchForm, MatchProposal, Connect, MatchViewer},
+  components: { MatchForm, MatchProposal, Connect, MatchViewer, PlayerCard},
   name: "Lobby",
   data() {
     return {
@@ -166,6 +165,7 @@ export default {
   },
   computed:  {
     lobby() {
+      console.log(this.$store.state.lobby.data);
       return this.$store.state.lobby.lobby.data;
     },
     isConnected() {
