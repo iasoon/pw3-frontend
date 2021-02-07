@@ -209,6 +209,13 @@ export default {
       axios.get(`/api/lobbies/${lobbyId}`).then((response) => {
         this.$store.commit('storeLobby', response.data);
         this.viewMode = 'ready';
+      }).catch(err => {
+        if (err.status == 404) {
+          // todo: maybe there is a more appropriate way? 
+          this.$router.push({ name: 'Home' });;
+        } else {
+          throw err;
+        }
       });
     },
   },
