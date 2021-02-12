@@ -6,20 +6,6 @@ export type State = {
     lobby: LobbyState,
 }
 
-// function getUser(): User | undefined {
-//     const retrieved = window.localStorage.getItem('user');
-//     if (!retrieved) {
-//         return;
-//     }
-//     const parsed = JSON.parse(retrieved);
-
-//     if (parsed.nickname && parsed.token) {
-//         return {
-//             nickname: parsed.nickname,
-//             token: parsed.token,
-//         }
-//     }
-// }
 export const store = createStore<State>({
     modules: {
         lobby,

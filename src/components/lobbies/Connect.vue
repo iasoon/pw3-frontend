@@ -69,9 +69,29 @@ import axios from 'redaxios';
 
 import { socket } from '../../websocket';
 
+function getSavedUser(): any {
+    const retrieved = window.localStorage.getItem('credentials');
+    if (!retrieved) {
+        return;
+    }
+    const parsed = JSON.parse(retrieved);
+
+    if (parsed.name && parsed.token) {
+        return {
+            name: parsed.name,
+            token: parsed.token,
+        }
+    }
+}
+
+function saveUser(user: any) {
+  window.localStorage.setItem('credentials', JSON.stringify(user));
+}
+
+
 export default {
   data() {
-    const player = this.$store.state.lobby.lobby.player;
+    let player = this.$store.state.lobby.lobby.player || getSavedUser();
     if (player) {
       return {
         name: player.name,
@@ -100,6 +120,7 @@ export default {
         name: this.name,
         token: this.token,
       };
+      saveUser(playerParams);
       axios.post(`/api/lobbies/${this.lobbyId}/join`, playerParams).then((response) => {
         this.$store.commit('setLobbyPlayer', {
           ...response.data,
