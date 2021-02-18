@@ -1,18 +1,18 @@
 <template>
 <div class="container">
   <div class="content">
-    <h3> Welcome to PlanetWars </h3>
+    <h2> Welcome to PlanetWars </h2>
     <button class="create-lobby-button" v-on:click="createLobby()" :disabled="createPending">
       Create a lobby
     </button>
-    <p> Or ask a friends for a link </p>
+    <p> Or ask a friend for a link </p>
   </div>
 </div>
 </template>
 
 <style scoped>
 .container {
-  background-color: #000;
+  background-color: rgb(41, 41, 41);
   height: 100vh;
   width: 100vw;
   display: flex;

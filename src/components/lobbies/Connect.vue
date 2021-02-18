@@ -18,7 +18,7 @@
 
 <style scoped>
   .container {
-    background-color: #000;
+  background-color: rgb(41, 41, 41);
     /* width: 100vw;
     height: 100vh; */
   }
@@ -100,7 +100,7 @@ export default {
     } else {
       return {
         name: "",
-        token: "",
+        token: this.$route.query.token ? this.$route.query.token : "",
       };
     }
   },
