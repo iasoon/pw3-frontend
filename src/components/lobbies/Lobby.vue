@@ -39,7 +39,7 @@
     </ul>
     Matches:
     <ul class="match-list">
-      <li v-for="match in orderedMatches" :key=match.id v-on:click="viewMatch(match.id)" class="match-li">
+      <li v-for="match in orderedMatches" :key=match.id v-on:click="viewMatch(match.id)" v-bind:class="matchCardClass(match.id)">
         {{showTimestamp(match.timestamp)}} {{match.config.map_file}}
         <ul class="match-player-list">
           <li v-for="(player_id, ix) in match.players" :key="ix" v-bind:style="{ color: playerColor(ix) }" class="match-player">
@@ -127,11 +127,15 @@
   padding: 0;
 }
 
-.match-li {
+.match-card {
   padding: .5em;
 }
 
-.match-li:hover {
+.match-card.selected {
+    background-color: #333;
+}
+
+.match-card:hover {
   background-color: #333;
 }
 
@@ -222,6 +226,13 @@ export default {
     },
     showJoinForm() {
       this.viewMode = 'joinForm';
+    },
+    matchCardClass(matchId: string): object {
+      const matchSelected = this.viewMode == 'match' && this.selectedMatchId == matchId;
+      return {
+        "match-card": true,
+        "selected":  matchSelected,
+      };
     },
     fetchLobbyData() {
       const lobbyId = this.$route.params.lobbyId;
