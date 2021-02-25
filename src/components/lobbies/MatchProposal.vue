@@ -1,5 +1,6 @@
 <template>
 <div class=box>
+  <div class="map-name">Map: {{ proposal.config.mapName }}</div>
   <ul class= "player-list">
     <li class="list-player" v-for="(player, ix) in players" :key="ix">
       <span class="player-name">
@@ -13,25 +14,34 @@
       </div>
     </li>
   </ul>
-  <button class="button button-accept" v-on:click="accept()" :disabled="!canAccept()" >
-    Accept
-  </button>
-  <button v-on:click="decline()" class="button button-decline">
-    Decline
-  </button>
-  <button v-if="proposal.owner_id === me.id" v-on:click="start" :disabled="startButtonDisabled()">
-    Start
-  </button>
+  <div class="buttons">
+    <button class="button button-accept" v-on:click="accept()" :disabled="!canAccept()" >
+      Accept
+    </button>
+    <button v-on:click="decline()" class="button button-decline">
+      Decline
+    </button>
+    <button class="button button-start" v-if="proposal.owner_id === me.id" v-on:click="start" :disabled="startButtonDisabled()">
+      {{ startButtonText() }}
+    </button>
+  </div>
 </div>
 </template>
 
 <style scoped>
 @import "./styles.css";
+.map-name {
+  margin: 20px 0;
+}
 
+.buttons {
+  margin-top: 20px;
+}
 .button {
   padding: 5px 16px;
   border: 0;
-  border-radius: 5px;
+  border-radius: 3px;
+  margin: 3px;
 }
 
 .button-accept {
@@ -46,6 +56,21 @@
 .button-decline {
   color: white;
   background-color: red;
+}
+
+.button-start {
+  float: right;
+}
+
+.button-start {
+  color: white;
+  background-color: #0376da;
+}
+.button-start:hover {
+  background-color: #026ac4;
+}
+.button-start:disabled {
+  background-color: lightgray;
 }
 
 .status-disconnected {
@@ -88,6 +113,15 @@ export default {
     },
     startButtonDisabled() {
       return this.started || !this.canStart();
+    },
+    startButtonText() {
+      if (this.started) {
+        return "match started";
+      }
+      if (this.canStart()) {
+        return "start match";
+      }
+      return "waiting for players";
     },
     accept() {
       this.updateAcceptedStatus('Accepted');

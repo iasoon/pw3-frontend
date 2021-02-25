@@ -40,7 +40,7 @@
     Matches:
     <ul class="match-list">
       <li v-for="match in orderedMatches" :key=match.id v-on:click="viewMatch(match.id)" v-bind:class="matchCardClass(match.id)">
-        {{showTimestamp(match.timestamp)}} {{match.config.map_file}}
+        {{showTimestamp(match.timestamp)}} {{match.config.mapName}}
         <ul class="match-player-list">
           <li v-for="(player_id, ix) in match.players" :key="ix" v-bind:style="{ color: playerColor(ix) }" class="match-player">
             {{lobby.players[player_id].name}}
@@ -97,7 +97,7 @@
 
 .sidebar-left {
   width: 200px;
-  color: #ccc;
+  color: #eee;
   overflow: hidden;
 }
 
@@ -105,7 +105,7 @@
   width: 20%;
   max-width: 400px;
   min-width: 200px;
-  color: #ccc;
+  color: #eee;
   overflow: hidden;
 }
 

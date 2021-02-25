@@ -1,6 +1,7 @@
 .box {
     margin: auto;
     max-width: 600px;
+    color: #eee;
 }
   
 .player-list {
@@ -18,7 +19,7 @@
 }
 
 .list-player:hover {
-    background: lightgray;
+    background: #333;
 }
 
 .addPlayer {
