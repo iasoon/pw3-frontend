@@ -1,8 +1,5 @@
 <template>
-<div v-if="!isConnected">
-  <Connect />
-</div>
-<div class="container" v-else-if="lobby">
+<div class="container" v-if="lobby">
   <div class="sidebar-left">
     Players:
     <ul class="player-list">
@@ -11,6 +8,9 @@
   </div>
 
   <div class="view">
+    <div v-if="viewMode == 'joinForm'">
+      <Connect />
+    </div>
     <div v-if="viewMode == 'matchForm'">
       <match-form v-bind:lobby="lobby" v-on:created="viewProposal" />
     </div>
@@ -24,8 +24,11 @@
 
   <div class="sidebar-right">
     <div>
-      <button v-on:click="showMatchForm()" class="button-create-match">
+      <button v-on:click="showMatchForm()" class="action-button button-create-match" v-if="userConnected">
         new game
+      </button>
+      <button v-on:click="showJoinForm()" class="action-button button-join-lobby" v-else>
+        join lobby
       </button>
     </div>
     Invites:
@@ -69,15 +72,23 @@
   list-style: none;
 }
 
-.button-create-match {
-  background-color: #cc5900;
-  color: white;
+.action-button {
   padding: 8px 16px;
   border-radius: 8px;
   border: 0;
   font-size: 18pt;
   display: block;
   margin: 20px auto;
+}
+
+.button-join-lobby {
+  background-color: #0376da;
+  color: white;
+}
+
+.button-create-match {
+  background-color: #cc5900;
+  color: white;
 }
 
 .player {
@@ -137,6 +148,8 @@ import MatchViewer from "../MatchViewer.vue";
 import PlayerCard from "./PlayerCard.vue";
 
 import { useStore } from 'vuex'
+import wsConnection from '../../websocket';
+
 
 const PLAYER_COLORS = [
   "#FF8000",
@@ -165,10 +178,9 @@ export default {
   },
   computed:  {
     lobby() {
-      console.log(this.$store.state.lobby.data);
       return this.$store.state.lobby.lobby.data;
     },
-    isConnected() {
+    userConnected() {
       const lobbyState = this.$store.state.lobby;
       return lobbyState.lobby && lobbyState.lobby.player;
     },
@@ -204,11 +216,20 @@ export default {
     showMatchForm() {
       this.viewMode = 'matchForm';
     },
+    showJoinForm() {
+      this.viewMode = 'joinForm';
+    },
     fetchLobbyData() {
       const lobbyId = this.$route.params.lobbyId;
       axios.get(`/api/lobbies/${lobbyId}`).then((response) => {
         this.$store.commit('storeLobby', response.data);
+        console.log(response.data);
         this.viewMode = 'ready';
+        // TODO: provide feedback from websocket calls, and replace REST call
+        wsConnection.send({
+          type: 'subscribeToLobby',
+          lobbyId: lobbyId,
+        });
       }).catch(err => {
         if (err.status == 404) {
           // todo: maybe there is a more appropriate way? 

@@ -1,5 +1,4 @@
 <template>
-<div class="container">
   <div class="join-card">
     <div>
       <input type="text" class="connect-input" v-model="name" placeholder="Enter your name here"/>
@@ -13,14 +12,11 @@
       </button>
     </div>
   </div>
-</div>
 </template>
 
 <style scoped>
   .container {
     background-color: #000;
-    /* width: 100vw;
-    height: 100vh; */
   }
 
   .join-card {
@@ -31,6 +27,7 @@
     display: flex;
     flex-direction: column;
     min-width: 320px;
+    max-width: 400px;
   }
 
   .join-card > div {
@@ -67,7 +64,7 @@
 <script lang="ts">
 import axios from 'redaxios';
 
-import { socket } from '../../websocket';
+import wsConnection from '../../websocket';
 
 function getSavedUser(): any {
     const retrieved = window.localStorage.getItem('credentials');
@@ -126,11 +123,11 @@ export default {
           ...response.data,
           token: this.token,
         });
-          socket.send(JSON.stringify({
-            type: 'connect',
+          wsConnection.send({
+            type: 'authenticatePlayer',
             lobbyId: this.lobbyId,
             token: this.token,
-          }));
+          });
       });
     }
   }
