@@ -12,6 +12,7 @@
     "config-ini-parser": "^1.2.2",
     "extract-svg-path": "^2.1.0",
     "load-svg": "^1.0.0",
+    "moment": "^2.29.1",
     "redaxios": "^0.3.0",
     "svg-mesh-3d": "^1.1.0",
     "ts-heap": "^1.1.3",

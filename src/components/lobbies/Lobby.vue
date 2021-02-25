@@ -146,8 +146,8 @@ import MatchProposal from "./MatchProposal.vue";
 import Connect from "./Connect.vue"
 import MatchViewer from "../MatchViewer.vue";
 import PlayerCard from "./PlayerCard.vue";
+import moment from "moment";
 
-import { useStore } from 'vuex'
 import wsConnection from '../../websocket';
 
 
@@ -199,8 +199,12 @@ export default {
   },
   methods: {
     showTimestamp(dateStr: string): string {
-      const date = new Date(dateStr);
-      return `${date.getHours()}:${date.getMinutes()}`;
+      let t = moment(dateStr);
+      if (t.day() == moment().day()) {
+        return moment(dateStr).format("HH:mm");
+      } else {
+        return moment(dateStr).format("DD/MM");
+      }
     },
     playerColor(num: number): string {
       return PLAYER_COLORS[num % PLAYER_COLORS.length];
