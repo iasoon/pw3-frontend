@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
 import App from './App.vue';
 import router from './router';
-import store from './store';
+import {store, key} from './store';
 import './index.css'
 import init, {Game} from 'planetwars-rs';
 
@@ -11,8 +11,10 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 library.add(faCircle);
 
-init().then(m => {
-    const app = createApp(App).use(router).use(store);
+init().then((_: any) => {
+    const app = createApp(App)
+        .use(router)
+        .use(store, key);
     app.component('fa-icon', FontAwesomeIcon);
     app.mount('#app')
 });

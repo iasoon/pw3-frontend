@@ -1,4 +1,5 @@
 const rust = require('vite-plugin-rust');
+const path = require('path');
 const config = {
     proxy: {
         '/websocket': {
@@ -19,7 +20,10 @@ const config = {
                 'planetwars-rs': './visualiser',
             }
         }),
-    ]
+    ],
+    alias: {
+        '/@/': path.resolve(__dirname, './src'),
+    }
 }
 
 export default config;
