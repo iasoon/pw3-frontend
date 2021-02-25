@@ -58,7 +58,7 @@
   width: 100vw;
   height: 100vh;
   overflow-y: hidden;
-  background-color: #000;
+  background-color: rgb(41, 41, 41);
 }
 
 .fillHeight {

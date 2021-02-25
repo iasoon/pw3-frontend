@@ -15,10 +15,6 @@
 </template>
 
 <style scoped>
-  .container {
-    background-color: #000;
-  }
-
   .join-card {
     margin: auto;
     padding: 25px;
@@ -97,7 +93,7 @@ export default {
     } else {
       return {
         name: "",
-        token: "",
+        token: this.$route.query.token ? this.$route.query.token : "",
       };
     }
   },
