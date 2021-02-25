@@ -7,8 +7,8 @@
       <input type="text" class="connect-input" v-model="token" placeholder="connection token" />
     </div>
     <div>
-      <button v-on:click="connect" :disabled="buttonDisabled()" class="join-button">
-        Join lobby
+      <button v-on:click="connect" :disabled="buttonDisabled()" v-bind:class="buttonClass()">
+        {{ buttonText() }}
       </button>
     </div>
   </div>
@@ -38,22 +38,39 @@
     box-sizing: border-box;
   }
 
-  .join-button:disabled {
-    background-color: lightgray;
-    border-color: lightgray;
-    color: gray;
-  }
 
   .join-button {
     box-sizing: border-box;
     display: block;
     width: 100%;
-    padding: 5px 16px;
+    padding: 8px 16px;
     margin: 0;
     color: white;
-    border: #0376da 3px solid;
-    background-color: #0376da;
+    border: 0;
     border-radius: 3px;
+  }
+
+  .join-button.logged-out {
+    background-color: #0376da;
+  }
+  .join-button.logged-out:hover {
+    background-color: #026ac4;
+  }
+
+  .join-button.logged-out:disabled {
+    background-color: lightgray;
+    color: gray;
+  }
+
+  .join-button.login-success {
+    background-color: #008000;
+  }
+    .join-button.login-success:hover {
+    background-color: #007300;
+  }
+
+  .join-button.login-success:disabled {
+    background-color: #008000;
   }
 </style>
 
@@ -61,6 +78,9 @@
 import axios from 'redaxios';
 
 import wsConnection from '../../websocket';
+import { useStore } from 'vuex';
+import { computed } from 'vue';
+import { key } from '/@/store';
 
 function getSavedUser(): any {
     const retrieved = window.localStorage.getItem('credentials');
@@ -83,8 +103,17 @@ function saveUser(user: any) {
 
 
 export default {
+  setup(props) {
+    const store = useStore(key);
+
+    return {
+      lobby: computed(() => store.state.lobby.lobby.data),
+      player: computed(() => store.state.lobby.lobby.player),
+      login: (lobbyPlayer: object) => store.commit('setLobbyPlayer', lobbyPlayer),
+    };
+  },
   data() {
-    let player = this.$store.state.lobby.lobby.player || getSavedUser();
+    let player = this.player || getSavedUser();
     if (player) {
       return {
         name: player.name,
@@ -97,16 +126,38 @@ export default {
       };
     }
   },
-  computed: {
-    lobbyId() {
-      return this.$route.params.lobbyId;
-    }
-  },
   methods: {
+    credentialsChanged(): boolean {
+      if (!this.player) {
+        return false;
+      }
+      return this.name !== this.player.name || this.token !== this.player.token;
+    },
     buttonDisabled(): boolean {
+      if (this.player) {
+        return !this.credentialsChanged();
+      }
       const nameValid = this.name.length > 0;
       const tokenValid = this.token.match(/^[a-f0-9]{64}$/i) !== null;
       return !nameValid || !tokenValid;
+    },
+    buttonClass(): object {
+      return {
+        'join-button': true,
+        'login-success': this.player !== undefined,
+        'logged-out': this.player === undefined,
+      };
+    },
+    buttonText(): string {
+      if (!this.player) {
+        return 'Join lobby';
+      }
+      if (this.credentialsChanged()) {
+        return 'update credentials';
+      } else {
+        return 'Connected';
+      }
+      
     },
     connect() {
       const playerParams = {
@@ -114,16 +165,16 @@ export default {
         token: this.token,
       };
       saveUser(playerParams);
-      axios.post(`/api/lobbies/${this.lobbyId}/join`, playerParams).then((response) => {
-        this.$store.commit('setLobbyPlayer', {
+      axios.post(`/api/lobbies/${this.lobby.id}/join`, playerParams).then((response) => {
+        this.login({
           ...response.data,
           token: this.token,
         });
-          wsConnection.send({
-            type: 'authenticatePlayer',
-            lobbyId: this.lobbyId,
-            token: this.token,
-          });
+        wsConnection.send({
+          type: 'authenticatePlayer',
+          lobbyId: this.lobby.id,
+          token: this.token,
+        });
       });
     }
   }
