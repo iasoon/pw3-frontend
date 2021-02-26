@@ -173,8 +173,6 @@ impl Game {
     pub fn new(file: &str) -> Self {
         utils::set_panic_hook();
 
-        console_log!("Rust is busy being awesome!");
-
         // First line is fucked but we just filter out things that cannot parse
         let states: Vec<types::State> = file
             .split("\n")
@@ -217,6 +215,12 @@ impl Game {
             voronoi_vertices,
             voronoi_indices,
             voronoi_colors,
+        }
+    }
+
+    pub fn push_state(&mut self, state_str: &str) {
+        if let Ok(state) = serde_json::from_str(state_str) {
+            self.states.push(state);
         }
     }
 

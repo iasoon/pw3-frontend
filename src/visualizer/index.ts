@@ -123,7 +123,7 @@ export function init() {
   };
 }
 
-class GameInstance {
+export class GameInstance {
   resizer: Resizer;
   game: Game;
 
@@ -134,6 +134,11 @@ class GameInstance {
   text_factory: LabelFactory;
   planet_labels: Label[];
   ship_labels: Label[];
+
+  ship_ibo: IndexBuffer;
+  ship_vao: VertexArray;
+  // TODO: find a better way
+  max_num_ships: number;
 
   renderer: Renderer;
   planet_count: number;
@@ -181,11 +186,32 @@ class GameInstance {
     // List of [(x, y, r)] for all planets
     this._create_voronoi(planets);
     this._create_planets(planets, meshes);
-    this._create_shipes(ship_mesh);
+
+    // create_shipes
+    this.ship_ibo = new IndexBuffer(GL, ship_mesh.cells);
+    const ship_positions = new VertexBuffer(GL, ship_mesh.positions);
+    const ship_layout = new VertexBufferLayout();
+    ship_layout.push(GL.FLOAT, 3, 4, "a_position");
+    this.ship_vao = new VertexArray();
+    this.ship_vao.addBuffer(ship_positions, ship_layout);
+    this.max_num_ships = 0;
 
     // Set slider correctly
     this.turn_count = game.turn_count();
     ELEMENTS["turnSlider"].max = this.turn_count - 1 + "";
+  }
+
+  push_state(state: string) {
+      this.game.push_state(state);
+
+      if (this.frame == this.turn_count - 1) {
+        this.playing = true;
+      }
+      
+      // Set slider correctly
+      this.turn_count = this.game.turn_count();
+      console.log(this.turn_count);
+      this.updateTurnCounters();
   }
 
   _create_voronoi(planets: Float32Array) {
@@ -267,30 +293,6 @@ class GameInstance {
     }
   }
 
-  _create_shipes(ship_mesh: Mesh) {
-    const ship_ibo = new IndexBuffer(GL, ship_mesh.cells);
-    const ship_positions = new VertexBuffer(GL, ship_mesh.positions);
-    const ship_layout = new VertexBufferLayout();
-    ship_layout.push(GL.FLOAT, 3, 4, "a_position");
-    const ship_vao = new VertexArray();
-    ship_vao.addBuffer(ship_positions, ship_layout);
-
-    for (let i = 0; i < this.game.get_max_ships(); i++) {
-      this.renderer.addToDraw(
-        ship_ibo,
-        ship_vao,
-        this.shader,
-        {},
-        [],
-        LAYERS.ship
-      );
-
-      const label = this.text_factory.build(GL);
-      this.ship_labels.push(label);
-      this.renderer.addRenderable(label.getRenderable(), LAYERS.ship_label);
-    }
-  }
-
   on_resize() {
     this.resizer = new Resizer(CANVAS, [...this.game.get_viewbox()], true);
     const bbox = to_bbox(this.resizer.get_viewbox());
@@ -345,7 +347,25 @@ class GameInstance {
     const ship_counts = this.game.get_ship_counts();
     const ship_colours = this.game.get_ship_colours();
 
-    for (let i = 0; i < this.game.get_max_ships(); i++) {
+    for (let i = this.max_num_ships; i < ship_counts.length; i++) {
+      this.renderer.addToDraw(
+        this.ship_ibo,
+        this.ship_vao,
+        this.shader,
+        {},
+        [],
+        LAYERS.ship
+      );
+
+      const label = this.text_factory.build(GL);
+      this.ship_labels.push(label);
+      this.renderer.addRenderable(label.getRenderable(), LAYERS.ship_label);
+    }
+    if (ship_counts.length > this.max_num_ships)
+      this.max_num_ships = ship_counts.length;
+
+    // TODO: actually remove obsolete ships
+    for (let i = 0; i < this.max_num_ships; i++) {
       if (i < ship_counts.length) {
         this.ship_labels[i].setText(
           GL,
@@ -436,6 +456,9 @@ class GameInstance {
     if (time > this.last_time + ms_per_frame) {
       this.last_time = time;
       this.updateTurn(this.frame + 1);
+      if (this.frame == this.turn_count - 1) {
+        this.playing = false;
+      }
     }
 
     // Do GL things
@@ -507,10 +530,15 @@ class GameInstance {
       this.playing = true;
     }
 
+    this.updateTurnCounters();
+  }
+
+  updateTurnCounters() {
     ELEMENTS["turnCounter"].innerHTML =
       this.frame + " / " + (this.turn_count - 1);
     ELEMENTS["turnSlider"].value = this.frame + "";
-  }
+    ELEMENTS["turnSlider"].max = this.turn_count - 1 + "";
+  } 
 
   handleKey(event: KeyboardEvent) {
     // Space
@@ -551,7 +579,7 @@ var game_instance: GameInstance;
 var meshes: Mesh[];
 var shaders: Dictionary<ShaderFactory>;
 
-export async function set_instance(source: string) {
+export async function set_instance(source: string): Promise<GameInstance> {
   if (!meshes || !shaders) {
     const mesh_promises = ["ship.svg", "earth.svg", "mars.svg", "venus.svg"]
       .map((name) => "/static/res/assets/" + name)
@@ -603,6 +631,7 @@ export async function set_instance(source: string) {
   );
 
   set_loading(false);
+  return game_instance;
 }
 
 function step(time: number) {
