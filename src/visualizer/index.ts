@@ -630,7 +630,23 @@ export async function set_instance(source: string): Promise<GameInstance> {
   );
 
   set_loading(false);
+  start();
   return game_instance;
+}
+
+var _animating = false;
+
+export function start() {
+  if (_animating) {
+    // already running
+    return;
+  }
+  _animating = true;
+  requestAnimationFrame(step);
+}
+
+export function stop() {
+  _animating = false;
 }
 
 function step(time: number) {
@@ -638,7 +654,7 @@ function step(time: number) {
     game_instance.render(time);
   }
 
-  requestAnimationFrame(step);
+  if (_animating) {
+    requestAnimationFrame(step);
+  }
 }
-
-requestAnimationFrame(step);

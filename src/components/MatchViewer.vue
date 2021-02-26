@@ -96,6 +96,7 @@ export default {
     },
     unmounted() {
       setActiveSpaghetti(undefined);
+      vis.stop();
     },
     updated() {
       if (this.match && this.match.id !== this.matchId) {
@@ -111,7 +112,6 @@ export default {
         if (this.match?.status === 'done') {
           setActiveSpaghetti(undefined);
           this.loading = true;
-          console.log('got data');
           fetch(`/api/matches/${this.match.id}`)
             .then(resp => resp.json())
             .then(data => {
