@@ -15,7 +15,7 @@
       <match-form v-bind:lobby="lobby" v-on:created="viewProposal" />
     </div>
     <div v-if="viewMode == 'proposal'">
-      <match-proposal v-bind:proposal="lobby.proposals[selectedProposal]"/>
+      <match-proposal v-bind:proposal="selectedProposal"/>
     </div>
     <div class="fillHeight" v-if="viewMode == 'match'">
       <match-viewer v-bind:match="selectedMatch" />
@@ -40,7 +40,9 @@
     Matches:
     <ul class="match-list">
       <li v-for="match in orderedMatches" :key=match.id v-on:click="viewMatch(match.id)" v-bind:class="matchCardClass(match.id)">
-        {{showTimestamp(match.timestamp)}} {{match.config.mapName}}
+        <span class="match-timestamp">{{showTimestamp(match.timestamp)}}</span>
+        <span class="match-mapname">{{match.config.mapName}}</span>
+        <span v-if="match.status == 'playing'" class="match-progress">in progress</span>
         <ul class="match-player-list">
           <li v-for="(player_id, ix) in match.players" :key="ix" v-bind:style="{ color: playerColor(ix) }" class="match-player">
             {{lobby.players[player_id].name}}
@@ -131,6 +133,18 @@
   padding: .5em;
 }
 
+.match-timestamp {
+  color: #ccc;
+}
+
+.match-mapname {
+  padding: 0 0.5em;
+}
+.match-progress {
+  float: right;
+  color: #bbb;
+}
+
 .match-card.selected {
     background-color: #333;
 }
@@ -173,8 +187,8 @@ export default {
   data() {
     return {
       viewMode: 'loading',
-      selectedProposal: null,
-      selectedMatchId: null,
+      selectedProposalId: undefined,
+      selectedMatchId: undefined,
     };
   },
   created() {
@@ -192,6 +206,12 @@ export default {
       if (!this.selectedMatchId) return undefined;
       return this.$store.state.lobby.lobby.data?.matches[this.selectedMatchId];
     },
+    selectedProposal() {
+      if (!this.selectedProposalId || !this.lobby) {
+        return undefined;
+      }
+      return this.lobby.proposals[this.selectedProposalId];
+    },
     openProposals() {
       const lobby = this.$store.state.lobby.lobby.data;
       return Object.values(lobby.proposals).filter(p => p.status === 'pending');
@@ -199,6 +219,16 @@ export default {
     orderedMatches() {
       const lobby = this.$store.state.lobby.lobby.data;
       return Object.values(lobby.matches).sort((a:any, b:any) => (new Date(a.timestamp) < new Date(b.timestamp)) ? 1 : -1)
+    }
+  },
+  watch: {
+    selectedProposal: {
+      handler(val, _oldval) {
+        // if the proposal you are viewing starts, go to match view
+        if (this.viewMode === 'proposal' && val.match_id) {
+          this.viewMatch(val.match_id);
+        }
+      }
     }
   },
   methods: {
@@ -215,7 +245,7 @@ export default {
     },
     viewProposal(id: any) {
       this.viewMode = 'proposal';
-      this.selectedProposal = id;
+      this.selectedProposalId = id;
     },
     viewMatch(id: any) {
       this.viewMode = 'match';

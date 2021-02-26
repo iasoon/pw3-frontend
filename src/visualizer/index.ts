@@ -210,7 +210,6 @@ export class GameInstance {
       
       // Set slider correctly
       this.turn_count = this.game.turn_count();
-      console.log(this.turn_count);
       this.updateTurnCounters();
   }
 
