@@ -35,7 +35,7 @@
     </div>
     <div class="sidebar-header">invites</div>
     <ul class="invite-list">
-      <li v-for="proposal in openProposals" :key=proposal.id v-on:click="viewProposal(proposal.id)" class="invite-li">
+      <li v-for="proposal in openInvites" :key=proposal.id v-on:click="viewProposal(proposal.id)" class="invite-li">
         {{lobby.players[proposal.owner_id].name}} {{proposal.config.map_file}}
       </li>
     </ul>
@@ -199,6 +199,10 @@ const PLAYER_COLORS = [
   "#0DC5FF",
 ];
 
+function proposalHasPlayer(proposal: any, playerId: number): boolean {
+  return proposal.players.some((player: any) => player.player_id === playerId);
+}
+
 export default {
   components: { MatchForm, MatchProposal, Connect, MatchViewer, PlayerCard},
   name: "Lobby",
@@ -230,9 +234,10 @@ export default {
       }
       return this.lobby.proposals[this.selectedProposalId];
     },
-    openProposals() {
+    openInvites() {
       const lobby = this.$store.state.lobby.lobby.data;
-      return Object.values(lobby.proposals).filter(p => p.status === 'pending');
+      const myId = this.$store.state.lobby.lobby?.player?.id;
+      return Object.values(lobby.proposals).filter((p: any) => proposalHasPlayer(p, myId) && p.status === 'pending');
     },
     orderedMatches() {
       const lobby = this.$store.state.lobby.lobby.data;
