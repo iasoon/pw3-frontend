@@ -72,13 +72,41 @@
     list-style: none;
 }
 
-.invite-li {
-    padding: 0 3px;
+.proposal-card {
+    margin: 10px 24px;
+    padding: 10px 10px;
     padding-left: 14px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    background-color: #333;
 }
 
-.invite-li:hover {
-    background-color: #333;
+
+.proposal-card:hover {
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+}
+
+.proposal-card.proposal-pending:hover .invite-card-check {
+    visibility: visible;
+}
+
+.invite-card-sender {
+    padding: 0.5em;
+    color: #ccc;
+}
+
+.invite-card-check {
+    float: right;
+    visibility: hidden;
+}
+
+.proposal-pending .invite-card-check:hover {
+    transform: scale(1.8);
+    color: green;
+}
+
+.proposal-accepted .invite-card-check {
+    visibility: visible;
+    color: green;
 }
 
 .match-list {

@@ -175,7 +175,8 @@ export default {
           lobbyId: this.lobby.id,
           token: this.token,
         });
-      });
+      })
+      .catch((err) => alert(`${err.status} ${JSON.stringify(err.body)}`));
     }
   }
 };

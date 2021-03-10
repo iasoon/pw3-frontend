@@ -17,7 +17,10 @@
       <match-form v-bind:lobby="lobby" v-on:created="viewProposal" />
     </div>
     <div v-if="viewMode == 'proposal'">
-      <match-proposal v-bind:proposal="selectedProposal"/>
+      <match-proposal
+        v-bind:proposal="selectedProposal"
+        v-bind:updateAcceptedStatus="updateAcceptedStatus"
+      />
     </div>
     <div class="fillHeight" v-if="viewMode == 'match'">
       <match-viewer v-bind:match="selectedMatch" />
@@ -35,8 +38,10 @@
     </div>
     <div class="sidebar-header">invites</div>
     <ul class="invite-list">
-      <li v-for="proposal in openInvites" :key=proposal.id v-on:click="viewProposal(proposal.id)" class="invite-li">
-        {{lobby.players[proposal.owner_id].name}} {{proposal.config.map_file}}
+      <li v-for="proposal in openInvites" :key=proposal.id v-on:click="viewProposal(proposal.id)" v-bind:class="proposalCardClass(proposal)">
+        <span class="invite-card-sender">{{lobby.players[proposal.owner_id].name}}</span>
+        <span class="invite-card-map">{{proposal.config.mapName}}</span>
+        <fa-icon icon="check" class="invite-card-check" v-on:click.stop="acceptProposal(proposal)"/>
       </li>
     </ul>
     <div class="sidebar-header">match history</div>
@@ -89,6 +94,21 @@ function proposalHasPlayer(proposal: any, playerId: number): boolean {
   return proposal.players.some((player: any) => player.player_id === playerId);
 }
 
+function playerAcceptedProposal(proposal: any, playerId: number): boolean {
+  return proposal.players
+    .filter((player:any) => player.player_id == playerId)
+    .every((player: any) => player.status == 'Accepted')
+}
+
+function proposalClassObject(proposal: any, playerId: number): object {
+  const accepted = playerAcceptedProposal(proposal, playerId);
+  return {
+    'proposal-card': true,
+    'proposal-accepted': accepted,
+    'proposal-pending': !accepted,
+  }
+}
+
 export default {
   components: { MatchForm, MatchProposal, Connect, MatchViewer, PlayerCard},
   name: "Lobby",
@@ -106,6 +126,9 @@ export default {
     lobby() {
       return this.$store.state.lobby.lobby.data;
     },
+    player() {
+      return this.$store.state.lobby.lobby?.player;
+    },
     userConnected() {
       const lobbyState = this.$store.state.lobby;
       return lobbyState.lobby && lobbyState.lobby.player;
@@ -122,8 +145,9 @@ export default {
     },
     openInvites() {
       const lobby = this.$store.state.lobby.lobby.data;
-      const myId = this.$store.state.lobby.lobby?.player?.id;
-      return Object.values(lobby.proposals).filter((p: any) => proposalHasPlayer(p, myId) && p.status === 'pending');
+      const myId = this.player?.id;
+      return Object.values(lobby.proposals)
+        .filter((p: any) => proposalHasPlayer(p, myId) && p.status === 'pending');
     },
     orderedMatches() {
       const lobby = this.$store.state.lobby.lobby.data;
@@ -173,11 +197,14 @@ export default {
         "selected":  matchSelected,
       };
     },
+    proposalCardClass(proposal: any): object {
+      const myId = this.$store.state.lobby.lobby?.player?.id;
+      return proposalClassObject(proposal, myId);
+    },
     fetchLobbyData() {
       const lobbyId = this.$route.params.lobbyId;
       axios.get(`/api/lobbies/${lobbyId}`).then((response) => {
         this.$store.commit('storeLobby', response.data);
-        console.log(response.data);
         this.viewMode = 'ready';
         // TODO: provide feedback from websocket calls, and replace REST call
         wsConnection.send({
@@ -193,6 +220,21 @@ export default {
         }
       });
     },
+    updateAcceptedStatus(proposalId: String, status: String) {
+      const lobbyId = this.$store.state.lobby.lobby.data.id;
+
+      axios.post(`/api/lobbies/${lobbyId}/proposals/${proposalId}/accept`,
+        { status: status },
+        { headers: { 'Authorization': `Bearer ${this.player?.token}` } }
+      ).then(resp => {
+        this.$store.commit('updateProposal', resp.data);
+      })
+    },
+    acceptProposal(proposal: any) {
+      if (!playerAcceptedProposal(proposal, this.player?.id)) {
+        this.updateAcceptedStatus(proposal.id, 'Accepted');
+      }
+    }
   },
 };
 </script>

@@ -84,6 +84,7 @@ import axios from 'redaxios';
 export default {
   props: {
     proposal: Object,
+    updateAcceptedStatus: Function,
   },
   data() {
     return {
@@ -124,23 +125,12 @@ export default {
       return "waiting for players";
     },
     accept() {
-      this.updateAcceptedStatus('Accepted');
+      if (this.updateAcceptedStatus)
+        this.updateAcceptedStatus(this.proposal?.id, 'Accepted');
     },
     decline() {
-      this.updateAcceptedStatus('Rejected');
-    },
-    updateAcceptedStatus(status: string) {
-      const lobbyId = this.$store.state.lobby.lobby.data.id;
-      const proposalId = this.proposal?.id;
-      const player = this.$store.state.lobby.lobby.player;
-
-      axios.post(`/api/lobbies/${lobbyId}/proposals/${proposalId}/accept`,
-        { status: status },
-        { headers: { 'Authorization': `Bearer ${player?.token}` } }
-      ).then(resp => {
-        this.$store.commit('updateProposal', resp.data);
-      })
-
+      if (this.updateAcceptedStatus)
+        this.updateAcceptedStatus(this.proposal?.id, 'Rejected');
     },
     start() {
       const lobbyId = this.$store.state.lobby.lobby.data.id;
