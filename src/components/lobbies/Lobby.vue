@@ -1,10 +1,12 @@
 <template>
 <div class="container" v-if="lobby">
   <div class="sidebar-left">
-    Players:
-    <ul class="player-list">
-      <player-card v-bind:player="player" v-for="player in lobby.players" :key="player.id"/>
-    </ul>
+    <div class="sidebar-players">
+      <div class="sidebar-header">players</div>
+      <ul class="player-list">
+        <player-card v-bind:player="player" v-for="player in lobby.players" :key="player.id"/>
+      </ul>
+    </div>
   </div>
 
   <div class="view">
@@ -31,13 +33,13 @@
         join lobby
       </button>
     </div>
-    Invites:
+    <div class="sidebar-header">invites</div>
     <ul class="invite-list">
       <li v-for="proposal in openProposals" :key=proposal.id v-on:click="viewProposal(proposal.id)" class="invite-li">
         {{lobby.players[proposal.owner_id].name}} {{proposal.config.map_file}}
       </li>
     </ul>
-    Matches:
+    <div class="sidebar-header">match history</div>
     <ul class="match-list">
       <li v-for="match in orderedMatches" :key=match.id v-on:click="viewMatch(match.id)" v-bind:class="matchCardClass(match.id)">
         <span class="match-timestamp">{{showTimestamp(match.timestamp)}}</span>
@@ -70,8 +72,22 @@
 .view {
   flex-grow: 1;
 }
+
+.sidebar-header {
+  margin-top: 2em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: rgba(255, 255,255, 0.7);
+  font-size: 14px;
+  font-family: "Open Sans", sans-serif;
+  padding-left: 14px;
+}
+
 .player-list {
   list-style: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-left: 18px;
 }
 
 .action-button {
@@ -98,15 +114,14 @@
 }
 
 .sidebar-left {
-  width: 200px;
+  width: 250px;
   color: #eee;
   overflow: hidden;
 }
 
 .sidebar-right {
   width: 20%;
-  max-width: 400px;
-  min-width: 200px;
+  width: 350px;
   color: #eee;
   overflow: hidden;
 }
@@ -118,6 +133,7 @@
 
 .invite-li {
   padding: 0 3px;
+  padding-left: 14px;
 }
 
 .invite-li:hover {
@@ -131,6 +147,7 @@
 
 .match-card {
   padding: .5em;
+  padding-left: 14px;
 }
 
 .match-timestamp {
@@ -140,6 +157,7 @@
 .match-mapname {
   padding: 0 0.5em;
 }
+
 .match-progress {
   float: right;
   color: #bbb;
