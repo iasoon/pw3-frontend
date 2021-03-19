@@ -138,4 +138,6 @@
 
 .match-card:hover {
     background-color: #333;
+    overflow-y: scroll;
+    height: 100%;
 }
