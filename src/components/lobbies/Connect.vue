@@ -80,7 +80,7 @@ import axios from 'redaxios';
 import wsConnection from '../../websocket';
 import { useStore } from 'vuex';
 import { computed } from 'vue';
-import { key } from '/@/store';
+import { key } from '../../store';
 
 function getSavedUser(): any {
     const retrieved = window.localStorage.getItem('credentials');

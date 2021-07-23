@@ -138,7 +138,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "planetwars"
+name = "planetwars-rs"
 version = "0.1.0"
 dependencies = [
  "console_error_panic_hook",

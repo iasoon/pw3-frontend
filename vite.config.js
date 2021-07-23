@@ -1,6 +1,11 @@
-const rust = require('vite-plugin-rust');
 const path = require('path');
-const config = {
+// import ViteRsw from 'vite-plugin-rsw';
+
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue'
+import nodePolyfills from 'rollup-plugin-polyfill-node';
+
+export default defineConfig({
     proxy: {
         '/websocket': {
             target: 'ws://localhost:7412',
@@ -11,19 +16,18 @@ const config = {
             rewrite: p => p.replace(/^\/api/, 'http://localhost:7412'),
         }
     },
-    optimizeDeps: {
-        'exclude': 'planetwars-rs'
-    },
     plugins: [
-        rust({
-            crates: {
-                'planetwars-rs': './visualiser',
-            }
-        }),
+        vue(),
+        nodePolyfills(),
+        // ViteRsw({
+        //     crates: [
+        //         'planetwars-rs',
+        //     ]
+        // }),
     ],
-    alias: {
-        '/@/': path.resolve(__dirname, './src'),
+    resolve: {
+        alias: {
+            '@': path.resolve(__dirname, './src'),
+        }    
     }
-}
-
-export default config;
+})

@@ -7,6 +7,12 @@
   <title>Planetwars</title>
 </head>
 <body>
+  <!-- polyfill global because shit dependencies -->
+  <script>
+    const global = globalThis;
+  </script>
+  <!-- end polyfill -->
+
   <div id="app"></div>
   <script type="module" src="/src/main.ts"></script>
 </body>

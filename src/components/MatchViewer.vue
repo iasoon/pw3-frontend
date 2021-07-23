@@ -26,7 +26,7 @@
 
 <script lang="ts">
 import * as vis from '../visualizer/index';
-import wsConnection from '/@/websocket';
+import wsConnection from '@/websocket';
 
 // TODO how should this be called
 class MatchLogSpaghetti {
